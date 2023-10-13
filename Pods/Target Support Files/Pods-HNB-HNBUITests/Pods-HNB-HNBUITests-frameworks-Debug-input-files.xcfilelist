@@ -1,0 +1,3 @@
+${PODS_ROOT}/Target Support Files/Pods-HNB-HNBUITests/Pods-HNB-HNBUITests-frameworks.sh
+${BUILT_PRODUCTS_DIR}/ProgressHUD/ProgressHUD.framework
+${BUILT_PRODUCTS_DIR}/SAMKeychain/SAMKeychain.framework

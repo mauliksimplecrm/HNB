@@ -1,0 +1,20 @@
+PODS:
+  - ProgressHUD (13.6)
+  - SAMKeychain (1.5.3)
+
+DEPENDENCIES:
+  - ProgressHUD
+  - SAMKeychain
+
+SPEC REPOS:
+  trunk:
+    - ProgressHUD
+    - SAMKeychain
+
+SPEC CHECKSUMS:
+  ProgressHUD: 4bdaa0d2ddf676b23324b199f9facffb5c3a1620
+  SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
+
+PODFILE CHECKSUM: 70c5d158761a6ab701aaadea728d0d951aa18a5c
+
+COCOAPODS: 1.11.3

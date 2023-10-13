@@ -1,0 +1,6 @@
+framework module Pods_HNB_HNBUITests {
+  umbrella header "Pods-HNB-HNBUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
