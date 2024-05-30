@@ -41,6 +41,8 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
     
     @IBOutlet weak var viewJailAlert: UIView!
     
+    @IBOutlet weak var imgiconJailbreak: UIImageView!
+    @IBOutlet weak var lblTitle_jailbreak: UILabel!
     
     
     //MARK: - Veriable
@@ -80,13 +82,16 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
     var mNativeToWebHandler_getDeviceId : String = "getDeviceId"
     var mNativeToWebHandler_getLoginUserID : String = "getLoginUserID"
     
+    var mNativeToWebHandler_getEncryptedString : String = "getEncryptedString"
+    var mNativeToWebHandler_getDecryptedString : String = "getDecryptedString"
+    
     var webConsoleLogs : String = "logHandler"
     
     var locationTextField : String = ""
     
     let reachability = try! Reachability()
     
-    
+    var encryptionRequestFor = ""
     
     
     //MARK: - Life Cycle
@@ -102,6 +107,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.setNavigationBarHidden(true, animated: true)
         print("viewDidLoad")
         testButton.isHidden = true
         // Do any additional setup after loading the view.
@@ -123,19 +129,23 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
         //        }
         //        ScreenGuardManager.shared.guardScreenshot(for: window)
         
-        if getJailbrokenStatus() {
-            //            let alertController = UIAlertController(title: "Jailbreak Device", message: "", preferredStyle: .alert)
-            //
-            //            let cancelAction = UIAlertAction(title: "OK", style: .cancel)
-            //            alertController.addAction(cancelAction)
-            //
-            //            self.present(alertController, animated: true, completion: nil)
-            viewJailAlert.isHidden = false
-        }else if getSIMULTORRUNAPP(){
-                viewJailAlert.isHidden = false
-        }else{
-            viewJailAlert.isHidden = true
-        }
+//        if getJailbrokenStatus() {
+//            //            let alertController = UIAlertController(title: "Jailbreak Device", message: "", preferredStyle: .alert)
+//            //
+//            //            let cancelAction = UIAlertAction(title: "OK", style: .cancel)
+//            //            alertController.addAction(cancelAction)
+//            //
+//            //            self.present(alertController, animated: true, completion: nil)
+//            viewJailAlert.isHidden = false
+//        }else if getSIMULTORRUNAPP(){
+//            viewJailAlert.isHidden = false
+//            
+//            imgiconJailbreak.image = UIImage(named: "ic_no_phone")
+//            lblTitle_jailbreak.text = "Emulator detected, App is restricted to run on emulators.\n\nPlease use a smartphone to run the app."
+//            
+//        }else{
+//            viewJailAlert.isHidden = true
+//        }
         
         
         
@@ -149,15 +159,37 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
         //Setup the location manager
         //initCurrentLocation()
         //requestLocationPermission()
-        checkLocationPermission()
+        
         
 
         //--
         NotificationCenter.default.addObserver(self, selector: #selector(self.ReceivePushNotification(notification:)), name: Notification.Name("ReceivePushNotification"), object: nil)
-
+        NotificationCenter.default.addObserver(self, selector: #selector(self.did_Check_Location_Permission(notification:)), name: Notification.Name("did_Check_Location_Permission"), object: nil)
+        
+        //-------------
+        /*do {
+            let plaintext = "{\n  \"firebase_registration_id\" : {\n    \"os\" : \"iOS\",\n    \"model\" : \"iPhone 8 Plus\",\n    \"os_version\" : \"1.0.4\",\n    \"token\" : \"dsXLO0nnJksphF8dvtrpU-:APA91bGzwUAnMjVUtP8N3bmaWcq8LaDdIjjSKZMIK2bMhxKI6tsAIDliupNm5RUS-GkHfrUPnRY4hTUg0taTK1UQiPuhd27ITPlgc1BlZYeot35XcumUxTfRasOL5CaVBLSo2CvZ8Eb4\"\n  },\n  \"lat_c\" : \"23.048468\",\n  \"longi_c\" : \"72.673050\"\n}"
+            let key = "0123456789ABCDEF0123456789ABCDEF" //"0123456789ABCDEF0123456789ABCDEF" // 32-character key
+            let iv = "0123456789ABCDEF" // 16-character IV
+            //373632764d5243706c706d6973
+            do {
+                let encryptedText = try aesEncrypt(text: plaintext, key: key, iv: iv)
+                print("Encrypted: \(encryptedText)")
+                
+                let decryptedText = try aesDecrypt(encryptedText: encryptedText, key: key, iv: iv)
+                print("Decrypted: \(decryptedText)")
+            } catch let error {
+                print(error.localizedDescription)
+            }
+            
+        } catch let error {
+            print(error.localizedDescription)
+        }*/
     }
     override func viewWillAppear(_ animated: Bool) {
+        navigationController?.setNavigationBarHidden(true, animated: animated)
         
+        checkLocationPermission()
         
         //Internet check
         NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
@@ -211,6 +243,10 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
             UserDefaults.standard.removeObject(forKey: "Notification_URL")
             UserDefaults.standard.synchronize()
         }
+    }
+    @objc func did_Check_Location_Permission(notification: Notification) {
+        //--
+        checkLocationPermission()
     }
 
     func getUniqueDeviceIdentifier()  {
@@ -385,6 +421,13 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
         //Fetch login user token or id
         wkWebView.configuration.userContentController.add(self, name: mNativeToWebHandler_getLoginUserID)
         
+        //Fetch Encription String
+        wkWebView.configuration.userContentController.add(self, name: mNativeToWebHandler_getEncryptedString)
+        
+        //Fetch Decripted String
+        wkWebView.configuration.userContentController.add(self, name: mNativeToWebHandler_getDecryptedString)
+        
+        
         // inject JS to capture console.log output and send to iOS
         let source = "function captureLog(msg) { window.webkit.messageHandlers.logHandler.postMessage(msg); } window.console.log = captureLog;"
         let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
@@ -404,14 +447,59 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
     
     func showAlertForCallLog(){
         //--- Api call for the Create call log
-        self.makeApiCallToCreateCallLog()
+        if isEnableEncryption{
+            //-- set create call log request
+            let urlString = url
+            let token = token
+            print("urlString = \(urlString)")
+            print("token = \(token)")
+            
+            
+            
+            let duration =  calculateDuration(startTime: started, endTime: ended)
+            var requestObj = request as? [String : Any]
+            var dataObj = requestObj?["dataCall"] as? [String : Any]
+            var attributesObj = dataObj?["attributes"] as? [String : Any]
+            
+            //Modify the request param data
+            if(started == nil){
+                attributesObj?["date_start"] = ""
+                attributesObj?["date_end"] = ""
+                attributesObj?["status"] = "Missed"
+                
+            }else{
+                attributesObj?["date_start"] = convertDateToString(dateToConvert: started)
+                attributesObj?["date_end"] = convertDateToString(dateToConvert: ended)
+            }
+            
+            attributesObj?["duration_hours"] = hours
+            attributesObj?["duration_minutes"] =  minutes
+            attributesObj?["voice_call_duration_c"] = timeString
+            dataObj?["attributes"] = attributesObj
+            requestObj?["data"] = dataObj
+            
+            requestObj?.removeValue(forKey: "dataCall")
+            requestObj?.removeValue(forKey: "dataTicket")
+            if let requestObj_ = requestObj{
+                if let jsonObject = jsonBase64(object: requestObj_){
+                    print("Update User Detail API Param jsonObject: \(jsonObject)")
+                    encryptionRequestFor = "create_call_log"
+                    apptoweb_sendJsonToEncrypt(strJson: jsonObject)
+                }
+            }
+        }else{
+            self.makeApiCallToCreateCallLog(strEncriptionString: "")
+        }
+        
+        
+        
+        //---
+        
         
         //-- Open Dialog for the Create Ticket
         let number = phone
         lblDetail_TicketCreation.text = "Was the call with "+number+" made successfully.Do you want to create a Ticket?"
         viewTicketCreation.isHidden = false
-        
-        
         
         
         /*
@@ -676,15 +764,47 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
     }
     @IBAction func btnCreateTicket_TicketCreation(_ sender: Any) {
         viewTicketCreation.isHidden = true
-        apiCall_CreateTicket(Description: txtEnterDetail_TicketCreation.text)
+        if isEnableEncryption{
+            //-- set apiCall_CreateTicket request parameter
+            let urlString = url
+            let token = token
+            //        print("urlString = \(urlString)")
+            //        print("token = \(token)")
+            
+            let duration =  calculateDuration(startTime: started, endTime: ended)
+            var requestObj = request as? [String : AnyObject]
+            var dataObj = requestObj?["dataTicket"] as? [String : AnyObject]
+            var attributesObj = dataObj?["attributes"] as? [String : AnyObject]
+            
+            attributesObj?["description"] = txtEnterDetail_TicketCreation.text as AnyObject
+            
+            dataObj?["attributes"] = attributesObj as AnyObject
+            requestObj?["data"] = dataObj as AnyObject
+            
+            requestObj?.removeValue(forKey: "dataCall")
+            requestObj?.removeValue(forKey: "dataTicket")
+            if let requestObj_ = requestObj{
+                if let jsonObject = jsonBase64(object: requestObj_){
+                    print("Update User Detail API Param jsonObject: \(jsonObject)")
+                    encryptionRequestFor = "create_ticket"
+                    apptoweb_sendJsonToEncrypt(strJson: jsonObject)
+                }
+            }
+        }else{
+            apiCall_CreateTicket(strEncriptionString: "", description: txtEnterDetail_TicketCreation.text)
+        }
+        
+        
+        
+        
     }
     
     
     //MARK: - Web To iOS Native Communication
     //default method to listen to web comminucation
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-//        print("---- Name ---- ", message.name)
-//        print("---- Body ---- ", message.body)
+        print("---- Name ---- ", message.name)
+        print("---- Body ---- ", message.body)
         
         //Listen the console logs
         if(message.name == webConsoleLogs){
@@ -734,7 +854,15 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
         //-- Login User ID
         if message.name == mNativeToWebHandler_getLoginUserID {
             //print("Get LoginUser ID:\n\(message.name)\n\(message.body)")
-            
+            /*
+            if let dataBody = message.body as? [String : Any]{
+                let token = dataBody["token"] as? String ?? ""
+                    
+                //Save Login User Token
+                UserDefaults.standard.set(token, forKey: "LoginUserToken")
+                UserDefaults.standard.synchronize()
+            }
+             */
             //Save Login User Token
             UserDefaults.standard.set(message.body, forKey: "LoginUserToken")
             UserDefaults.standard.synchronize()
@@ -743,10 +871,84 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UIBa
             let coordinate = locationManager.location?.coordinate
             let latitude: String = String(format: "%f", coordinate?.latitude ?? "")
             let longitude: String = String(format: "%f", coordinate?.longitude ?? "")
-            apiCall_UPDATE_USER_DETAILS(Latitude: latitude, Longitude: longitude)
+            
+            if isEnableEncryption{
+                //--
+                let devicetoken = UserDefaults.standard.object(forKey: "FirebaseToken") as? String ?? "default"
+                let modelName = UIDevice.modelName
+                
+                //--
+                let dicParam:[String:AnyObject] = ["lat_c":"\(latitude)" as AnyObject,
+                                                   "longi_c":"\(longitude)" as AnyObject,
+                                                   "firebase_registration_id":["token": "\(devicetoken)",
+                                                                               "os":"iOS",
+                                                                               "model":"\(modelName)",
+                                                                               "os_version":"\(Bundle.main.releaseVersionNumber ?? "")"] as AnyObject]
+                
+                
+                print("Update User Detail API Param: \(dicParam)")
+                if let jsonObject = jsonBase64(object: dicParam){
+                    print("Update User Detail API Param jsonObject: \(jsonObject)")
+                    encryptionRequestFor = "update_login_user_Detail"
+                    apptoweb_sendJsonToEncrypt(strJson: jsonObject)
+                }
+            }else{
+                apiCall_UPDATE_USER_DETAILS(strEncriptionString: "", lat: latitude, longi: longitude)
+            }
+            
         }
         
+        //-- Get Encryption String
+        if message.name == mNativeToWebHandler_getEncryptedString {
+            print(message.body)
+            if encryptionRequestFor == "update_login_user_Detail"{
+                apiCall_UPDATE_USER_DETAILS(strEncriptionString: "\(message.body)", lat: "", longi: "")
+            }else if encryptionRequestFor == "create_ticket"{
+                apiCall_CreateTicket(strEncriptionString: "\(message.body)", description: "")
+            }else if encryptionRequestFor == "create_call_log"{
+                makeApiCallToCreateCallLog(strEncriptionString: "\(message.body)")
+            }
+        }
+        
+        //-- Get Decryption String
+        if message.name == mNativeToWebHandler_getDecryptedString {
+            print(message.body)
+            
+            
+        }
+//        print(message.body)
     }
+    
+    //---
+    //MARK: - App To Web Func
+    func apptoweb_sendJsonToEncrypt(strJson: String){
+        
+        self.wkWebView.evaluateJavaScript("sendJsonToEncrypt('\(strJson)')", completionHandler:{(result , error) in
+            if error == nil {
+                print("sendJsonToEncrypt success: \(String(describing: result))")
+                
+            }
+            else
+            {
+                print("sendJsonToEncrypt error: \(String(describing: error))")
+            }
+        })
+    }
+    
+    func apptoweb_sendStringToDecrypt(strEnc: String){
+        self.wkWebView.evaluateJavaScript("sendStringToDecrypt('\(strEnc)')", completionHandler:{(result , error) in
+            if error == nil {
+                print("sendStringToDecrypt success: \(String(describing: result))")
+                
+            }
+            else
+            {
+                print("sendStringToDecrypt error: \(String(describing: error))")
+            }
+        })
+    }
+    
+    //---
     
     typealias CompletionHandler = (_ locationText:String) -> Void
     
@@ -1111,8 +1313,6 @@ extension ViewController : CXCallObserverDelegate
             var endDateTime: Date? = nil
             endDateTime = endTime
             //print("calculateDuration: startDateTime \(startDateTime) endDateTime = \(endDateTime)")
-            
-            
             
             
             if(startDateTime == nil){

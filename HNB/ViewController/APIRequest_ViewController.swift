@@ -7,63 +7,108 @@
 
 import Foundation
 import UIKit
+//import LaraCrypt
+import CryptoSwift
+
 
 extension ViewController{
     
-    func apiCall_UPDATE_USER_DETAILS(Latitude lat:String, Longitude longi:String)  {
+    func apiCall_UPDATE_USER_DETAILS(strEncriptionString: String, lat: String, longi: String)  {
         //--
-        let devicetoken = UserDefaults.standard.object(forKey: "FirebaseToken") as? String ?? "default"
         let loginUserToken = UserDefaults.standard.object(forKey: "LoginUserToken") as? String ?? "default"
-        let modelName = UIDevice.modelName
+        let update_user_details = UserDefaults.standard.object(forKey: "update_user_details") as? String ?? ""
+        
+        
         
         //--
-        let dicParam:[String:AnyObject] = ["lat_c":lat as AnyObject,
-                                           "longi_c":longi as AnyObject,
-                                           "firebase_registration_id":["token": devicetoken,
-                                                                       "os":"iOS",
-                                                                       "model":modelName,
-                                                                       "os_version":"\(Bundle.main.releaseVersionNumber ?? "")"] as AnyObject]
-        HttpWrapper.requestWithPostMethod(url: API_UPDATE_USER_DETAILS, dicsParams: dicParam, headers: ["Authorization":"Bearer \(loginUserToken)"], showProgress: false, completion: { (response) in
+        var dicParam:[String:AnyObject] = [:]
+        if isEnableEncryption{
+            //--
+            dicParam = ["data":strEncriptionString as AnyObject]
+        }else{
+            //--
+            let devicetoken = UserDefaults.standard.object(forKey: "FirebaseToken") as? String ?? "default"
+            let modelName = UIDevice.modelName
+
+            //--
+            dicParam = ["lat_c":"\(lat)" as AnyObject,
+                        "longi_c":"\(longi)" as AnyObject,
+                        "firebase_registration_id":["token": "\(devicetoken)",
+                                                    "os":"iOS",
+                                                    "model":"\(modelName)",
+                                                    "os_version":"\(Bundle.main.releaseVersionNumber ?? "")"] as AnyObject]
+        }
+        
+        HttpWrapper.requestWithPostMethod(url: update_user_details, dicsParams: dicParam, headers: ["Authorization":"Bearer \(loginUserToken)"], showProgress: false, completion: { (response) in
             print("++++++++++++ RESPONSE ++++++++++++++\n\(response as Any)")
+            /*
+             if let data_ = response as? [String : AnyObject]{
+             print("\(data_["data"] as? String ?? "")")
+             self.apptoweb_sendStringToDecrypt(strEnc: "\(data_["data"] as? String ?? "")")
+             }
+             */
+            //                if let data_ = response as? [String : AnyObject]{
+            //                    let res = data_["data"] as? String ?? ""
+            
+            //                    do {
+            //                        let decryptedText = try aesDecryptWithoutIV(encryptedText: res, key: key)
+            //                        print("Decrypted: \(decryptedText)")
+            //                    } catch let error {
+            //                        print(error.localizedDescription)
+            //                    }
+            // let decriptedStr : String = LaraCrypt().decrypt(Message: res, Key: encryptionKey)
+            // print(decriptedStr)
+            //                }
             
         }) { (error) in
             print(error)
         }
+        
     }
     
+    
     //------ API Call For The Create Ticket
-    func apiCall_CreateTicket(Description desc:String)
+    func apiCall_CreateTicket(strEncriptionString: String, description:String)
     {
+        var dicParam:[String:AnyObject] = [:]
+        
         //--
         let urlString = url
-        let token = token
-        print("urlString = \(urlString)")
-        print("token = \(token)")
+        
+        if isEnableEncryption{
+            dicParam = ["data":strEncriptionString as AnyObject]
+        }else{
+            let token = token
+            
+            let duration =  calculateDuration(startTime: started, endTime: ended)
+            var requestObj = request as? [String : AnyObject]
+            var dataObj = requestObj?["dataTicket"] as? [String : AnyObject]
+            var attributesObj = dataObj?["attributes"] as? [String : AnyObject]
+            
+            attributesObj?["description"] = description as AnyObject
+            
+            dataObj?["attributes"] = attributesObj as AnyObject
+            requestObj?["data"] = dataObj as AnyObject
+            
+            requestObj?.removeValue(forKey: "dataCall")
+            requestObj?.removeValue(forKey: "dataTicket")
+            
+            dicParam = requestObj ?? [:]
+        }
 
-        let duration =  calculateDuration(startTime: started, endTime: ended)
-        var requestObj = request as? [String : AnyObject]
-        var dataObj = requestObj?["dataTicket"] as? [String : AnyObject]
-        var attributesObj = dataObj?["attributes"] as? [String : AnyObject]
-       
-        attributesObj?["description"] = desc as AnyObject
-        
-        dataObj?["attributes"] = attributesObj as AnyObject
-        requestObj?["data"] = dataObj as AnyObject
-        
-        requestObj?.removeValue(forKey: "dataCall")
-        requestObj?.removeValue(forKey: "dataTicket")
-        
-        //print("Request Parameter:\n\(requestObj ?? [:])")
         //--
-        /*let dicParam:[String:AnyObject] = ["lat":lat as AnyObject,
-                                           "longi":longi as AnyObject,
-                                           "firebase_registration_id":["token": "",
-                                                                       "os":"iOS",
-                                                                       "model":"",
-                                                                       "os_version":"\(Bundle.main.releaseVersionNumber ?? "")"] as AnyObject]*/
-        HttpWrapper.requestWithPostMethod(url: urlString, dicsParams: requestObj ?? [:], headers: ["Authorization":"Bearer \(token)"], showProgress: false, completion: { (response) in
+        HttpWrapper.requestWithPostMethod(url: urlString, dicsParams: dicParam, headers: ["Authorization":"Bearer \(token)"], showProgress: false, completion: { (response) in
             
             print("++++++++++++ RESPONSE ++++++++++++++\n\(response as Any)")
+            if isEnableEncryption{
+                if let data_ = response as? [String : AnyObject]{
+                    print("\(data_["data"] as? String ?? "")")
+                    self.apptoweb_sendStringToDecrypt(strEnc: "\(data_["data"] as? String ?? "")")
+                }
+            }else{
+                
+            }
+            
             self.txtEnterDetail_TicketCreation.text = ""
             self.viewTicketCreation.isHidden = true
             self.showAlertSuccess(msg: "Ticket created successfully")
@@ -73,49 +118,62 @@ extension ViewController{
     }
     
     //------ API Call For The Create Call Log
-    func makeApiCallToCreateCallLog(){
+    func makeApiCallToCreateCallLog(strEncriptionString: String){
         
         let urlString = url
-        let token = token
-        print("urlString = \(urlString)")
-        print("token = \(token)")
         
-        if(urlString == nil){
-            return;
-        }
+        var dicParam:[String:AnyObject] = [:]
         
-        let duration =  calculateDuration(startTime: started, endTime: ended)
-        var requestObj = request as? [String : Any]
-        var dataObj = requestObj?["dataCall"] as? [String : Any]
-        var attributesObj = dataObj?["attributes"] as? [String : Any]
-        
-        //Modify the request param data
-        if(started == nil){
-            attributesObj?["date_start"] = ""
-            attributesObj?["date_end"] = ""
-            attributesObj?["status"] = "Missed"
-            
+        if isEnableEncryption{
+            dicParam = ["data":strEncriptionString as AnyObject]
         }else{
-            attributesObj?["date_start"] = convertDateToString(dateToConvert: started as? Date)
-            attributesObj?["date_end"] = convertDateToString(dateToConvert: ended as? Date)
+            
+            
+            let token = token
+            print("urlString = \(urlString)")
+            print("token = \(token)")
+            
+            if(urlString == nil){
+                return;
+            }
+            
+            let duration =  calculateDuration(startTime: started, endTime: ended)
+            var requestObj = request as? [String : AnyObject]
+            var dataObj = requestObj?["dataCall"] as? [String : AnyObject]
+            var attributesObj = dataObj?["attributes"] as? [String : AnyObject]
+            
+            //Modify the request param data
+            if(started == nil){
+                attributesObj?["date_start"] = "" as AnyObject
+                attributesObj?["date_end"] = "" as AnyObject
+                attributesObj?["status"] = "Missed" as AnyObject
+                
+            }else{
+                attributesObj?["date_start"] = convertDateToString(dateToConvert: started) as AnyObject
+                attributesObj?["date_end"] = convertDateToString(dateToConvert: ended) as AnyObject
+            }
+            
+            attributesObj?["duration_hours"] = hours as AnyObject
+            attributesObj?["duration_minutes"] =  minutes as AnyObject
+            attributesObj?["voice_call_duration_c"] = timeString as AnyObject
+            dataObj?["attributes"] = attributesObj as AnyObject?
+            requestObj?["data"] = dataObj as AnyObject?
+            
+            requestObj?.removeValue(forKey: "dataCall")
+            requestObj?.removeValue(forKey: "dataTicket")
+            
+            dicParam = requestObj ?? [:]
         }
         
-        attributesObj?["duration_hours"] = hours
-        attributesObj?["duration_minutes"] =  minutes
-        attributesObj?["voice_call_duration_c"] = timeString
-        dataObj?["attributes"] = attributesObj
-        requestObj?["data"] = dataObj
+//        let jsonData1 = try! JSONSerialization.data(withJSONObject: requestObj)
+//        let jsonString1 = NSString(data: jsonData1, encoding: String.Encoding.utf8.rawValue) as! String
+//        print("makeApiCallToCreateCallLog: jsonString1 = \(jsonString1)")
         
-        requestObj?.removeValue(forKey: "dataCall")
-        requestObj?.removeValue(forKey: "dataTicket")
         
-        let jsonData1 = try! JSONSerialization.data(withJSONObject: requestObj)
-        let jsonString1 = NSString(data: jsonData1, encoding: String.Encoding.utf8.rawValue) as! String
-        print("makeApiCallToCreateCallLog: jsonString1 = \(jsonString1)")
         
         
         // create the url with URL
-        let url = URL(string: urlString as! String)!
+        let url = URL(string: urlString )!
         
         // create the session object
         let session = URLSession.shared
@@ -128,11 +186,11 @@ extension ViewController{
         request.addValue("application/json", forHTTPHeaderField: "Content-Type") // change as per server requirements
         //        request.addValue("application/json", forHTTPHeaderField: "Accept")
         
-        request.setValue("Bearer "+(token as! String), forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer "+(token ), forHTTPHeaderField: "Authorization")
         
         do {
             // convert parameters to Data and assign dictionary to httpBody of request
-            request.httpBody = try JSONSerialization.data(withJSONObject: requestObj, options: .prettyPrinted)
+            request.httpBody = try JSONSerialization.data(withJSONObject: dicParam, options: .prettyPrinted)
         } catch let error {
             print(error.localizedDescription)
             return
@@ -208,4 +266,51 @@ extension ViewController{
     }
     
     
+    
+    
+    
+    //*************************************
+    func aesEncrypt(text: String, key: String, iv: String) throws -> String {
+        let data = text.data(using: .utf8)!
+        let keyData = key.data(using: .utf8)!
+        let ivData = iv.data(using: .utf8)!
+        
+        let aes = try AES(key: keyData.bytes, blockMode: CBC(iv: ivData.bytes), padding: .pkcs7)
+        let encrypted = try aes.encrypt(data.bytes)
+        let encryptedData = Data(encrypted)
+        let base64String = encryptedData.base64EncodedString()
+        
+        return base64String
+    }
+    
+    func aesDecrypt(encryptedText: String, key: String, iv: String) throws -> String {
+        let encryptedData = Data(base64Encoded: encryptedText)!
+        let keyData = key.data(using: .utf8)!
+        let ivData = iv.data(using: .utf8)!
+        
+        let aes = try AES(key: keyData.bytes, blockMode: CBC(iv: ivData.bytes), padding: .pkcs7)
+        let decrypted = try aes.decrypt(encryptedData.bytes)
+        let decryptedData = Data(decrypted)
+        
+        if let decryptedText = String(data: decryptedData, encoding: .utf8) {
+            return decryptedText
+        } else {
+            throw NSError(domain: "DecryptionError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Decryption failed"])
+        }
+    }
+    
+    func jsonToString(json: [String:AnyObject]) -> String{
+        do {
+            let data1 =  try JSONSerialization.data(withJSONObject: json, options: JSONSerialization.WritingOptions.prettyPrinted) // first of all convert json to the data
+            let convertedString = String(data: data1, encoding: .utf8) // the data will be converted to the string
+            print(convertedString) // <-- here is ur string
+            return convertedString ?? ""
+        } catch let myJSONError {
+            print(myJSONError)
+        }
+        return ""
+    }
 }
+
+
+

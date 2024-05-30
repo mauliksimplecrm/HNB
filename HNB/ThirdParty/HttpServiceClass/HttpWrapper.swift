@@ -40,7 +40,7 @@ class HttpWrapper: NSObject
         
         //--
         if showProgress{
-           // AppHelper.showLinearProgress()
+            // AppHelper.showLinearProgress()
         }
         
         AF.upload(multipartFormData: { multipartFormData in
@@ -163,26 +163,26 @@ class HttpWrapper: NSObject
                 }
             }
         }, to: url, usingThreshold: UInt64.init(),method: .post, headers: headers)
-            .responseData { response in
-                //AppHelper.hideLinearProgress()
-                switch response.result {
-                case .success(let data):
-                    do {
-                        let asJSON = try JSONSerialization.jsonObject(with: data)
-                        // Handle as previously success
-                        var mydict = NSDictionary()
-                        mydict = asJSON as! NSDictionary
-                        completion(NSMutableDictionary(dictionary: mydict))
-                    } catch {
-                        // Here, I like to keep a track of error if it occurs, and also print the response data if possible into String with UTF8 encoding
-                        // I can't imagine the number of questions on SO where the error is because the API response simply not being a JSON and we end up asking for that "print", so be sure of it
-                        print("Error while decoding response: \(error) from: \(String(data: data, encoding: .utf8) ?? "")")
-                    }
-                case .failure(let error):
-                    errorBlock(error)
-                    // Handle as previously error
+        .responseData { response in
+            //AppHelper.hideLinearProgress()
+            switch response.result {
+            case .success(let data):
+                do {
+                    let asJSON = try JSONSerialization.jsonObject(with: data)
+                    // Handle as previously success
+                    var mydict = NSDictionary()
+                    mydict = asJSON as! NSDictionary
+                    completion(NSMutableDictionary(dictionary: mydict))
+                } catch {
+                    // Here, I like to keep a track of error if it occurs, and also print the response data if possible into String with UTF8 encoding
+                    // I can't imagine the number of questions on SO where the error is because the API response simply not being a JSON and we end up asking for that "print", so be sure of it
+                    print("Error while decoding response: \(error) from: \(String(data: data, encoding: .utf8) ?? "")")
                 }
+            case .failure(let error):
+                errorBlock(error)
+                // Handle as previously error
             }
+        }
         
     }
     
@@ -214,24 +214,24 @@ class HttpWrapper: NSObject
         do {
             // convert parameters to Data and assign dictionary to httpBody of request
             urlRequest.httpBody = try JSONSerialization.data(withJSONObject: dicsParams)
-          } catch let error {
+        } catch let error {
             print(error.localizedDescription)
             return
-          }
+        }
         
-         urlRequest.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-
-         
+        urlRequest.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        
+        
         urlRequest.headers = HTTPHeaders(headers)
-       
+        
         //AF.request(url, method: .post, parameters: dicsparmsFinal, encoding:  JSONEncoding.default, headers: HTTPHeaders(headers))
         AF.request(urlRequest)
-        .responseString(completionHandler: { (string) in
+            .responseString(completionHandler: { (string) in
                 print("**********************************\n\(dicsParams) ")
                 //print(string)
             })
         
-        .responseJSON (queue: queue){ response in
+            .responseJSON (queue: queue){ response in
                 
                 //print("Response JSON: \n \(String(describing: response.value))")
                 DispatchQueue.main.async {

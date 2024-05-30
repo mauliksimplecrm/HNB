@@ -17,6 +17,7 @@
 		18673BA1280568310033C648 /* HNBUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18673BA0280568310033C648 /* HNBUITests.swift */; };
 		18673BA3280568310033C648 /* HNBUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18673BA2280568310033C648 /* HNBUITestsLaunchTests.swift */; };
 		18A90430289D527100013E22 /* gearshape.png in Resources */ = {isa = PBXBuildFile; fileRef = 18A9042F289D527100013E22 /* gearshape.png */; };
+		690E23472B1460310042C648 /* EncDec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690E23462B1460310042C648 /* EncDec.swift */; };
 		693452ED2A8C7FFA00CBB21B /* APIRequest_ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693452EC2A8C7FFA00CBB21B /* APIRequest_ViewController.swift */; };
 		693452F02A8C814200CBB21B /* HttpWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693452EF2A8C814200CBB21B /* HttpWrapper.swift */; };
 		696DBF162A42BF3500924544 /* UIView+testView.m in Sources */ = {isa = PBXBuildFile; fileRef = 696DBEC82A42BF3500924544 /* UIView+testView.m */; };
@@ -26,6 +27,7 @@
 		696DBF4A2A4304B700924544 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696DBF492A4304B700924544 /* Reachability.swift */; };
 		697A3E732A5D6AF200F778D7 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 697A3E722A5D6AF200F778D7 /* FirebaseAuth */; };
 		697A3E782A5D80D300F778D7 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 697A3E772A5D80D300F778D7 /* FirebaseMessaging */; };
+		698231192AF9028500ACD8E2 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698231182AF9028500ACD8E2 /* Encryption.swift */; };
 		698345752A8A4C6000B7EFF6 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698345462A8A4C6000B7EFF6 /* ImageCache.swift */; };
 		698345762A8A4C6000B7EFF6 /* UIImage+AlamofireImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698345472A8A4C6000B7EFF6 /* UIImage+AlamofireImage.swift */; };
 		698345772A8A4C6000B7EFF6 /* AFIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698345482A8A4C6000B7EFF6 /* AFIError.swift */; };
@@ -138,6 +140,7 @@
 		2A71EA866DDAC4E308433A8C /* Pods-HNBTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HNBTests.release.xcconfig"; path = "Target Support Files/Pods-HNBTests/Pods-HNBTests.release.xcconfig"; sourceTree = "<group>"; };
 		43ABE9038096C02143D2319B /* Pods-HNBTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HNBTests.debug.xcconfig"; path = "Target Support Files/Pods-HNBTests/Pods-HNBTests.debug.xcconfig"; sourceTree = "<group>"; };
 		53C5E2A0D7A643D5D84C36C7 /* Pods_HNB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HNB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		690E23462B1460310042C648 /* EncDec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncDec.swift; sourceTree = "<group>"; };
 		693452EC2A8C7FFA00CBB21B /* APIRequest_ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequest_ViewController.swift; sourceTree = "<group>"; };
 		693452EF2A8C814200CBB21B /* HttpWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpWrapper.swift; sourceTree = "<group>"; };
 		696DBEC62A42BF3500924544 /* UIView+testView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+testView.h"; sourceTree = "<group>"; };
@@ -150,6 +153,7 @@
 		696DBF452A42C04500924544 /* AppHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppHelper.swift; sourceTree = "<group>"; };
 		696DBF492A4304B700924544 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		697A3E762A5D6F3100F778D7 /* HNB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HNB.entitlements; sourceTree = "<group>"; };
+		698231182AF9028500ACD8E2 /* Encryption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		698345462A8A4C6000B7EFF6 /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		698345472A8A4C6000B7EFF6 /* UIImage+AlamofireImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+AlamofireImage.swift"; sourceTree = "<group>"; };
 		698345482A8A4C6000B7EFF6 /* AFIError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AFIError.swift; sourceTree = "<group>"; };
@@ -288,6 +292,7 @@
 			isa = PBXGroup;
 			children = (
 				697A3E762A5D6F3100F778D7 /* HNB.entitlements */,
+				698231182AF9028500ACD8E2 /* Encryption.swift */,
 				696DBF442A42C02800924544 /* SupportingFiles */,
 				696DBEAF2A42BF3500924544 /* ThirdParty */,
 				7B6EABAE2A029B8700D02081 /* ScreenGuard */,
@@ -341,6 +346,7 @@
 			children = (
 				18673B832805682A0033C648 /* ViewController.swift */,
 				693452EC2A8C7FFA00CBB21B /* APIRequest_ViewController.swift */,
+				690E23462B1460310042C648 /* EncDec.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -813,6 +819,7 @@
 				69E391EE2AA0B75100BC9943 /* IQUIView+Hierarchy.swift in Sources */,
 				6983459E2A8A4C6000B7EFF6 /* EventMonitor.swift in Sources */,
 				698345762A8A4C6000B7EFF6 /* UIImage+AlamofireImage.swift in Sources */,
+				698231192AF9028500ACD8E2 /* Encryption.swift in Sources */,
 				698345A02A8A4C6000B7EFF6 /* ResponseSerialization.swift in Sources */,
 				6983459C2A8A4C6000B7EFF6 /* Request.swift in Sources */,
 				698345822A8A4C6000B7EFF6 /* URLSessionConfiguration+Alamofire.swift in Sources */,
@@ -869,6 +876,7 @@
 				698345952A8A4C6000B7EFF6 /* RequestTaskMap.swift in Sources */,
 				698345992A8A4C6000B7EFF6 /* Response.swift in Sources */,
 				698345852A8A4C6000B7EFF6 /* Concurrency.swift in Sources */,
+				690E23472B1460310042C648 /* EncDec.swift in Sources */,
 				698345802A8A4C6000B7EFF6 /* NetworkReachabilityManager.swift in Sources */,
 				18673B802805682A0033C648 /* AppDelegate.swift in Sources */,
 				698345972A8A4C6000B7EFF6 /* Notifications.swift in Sources */,

@@ -44,6 +44,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        
+        //--
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "did_Check_Location_Permission"), object: nil)
     }
 
     @available(iOS 13.0, *)

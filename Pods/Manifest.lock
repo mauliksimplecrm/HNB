@@ -1,20 +1,24 @@
 PODS:
+  - CryptoSwift (1.8.0)
   - ProgressHUD (13.6)
   - SAMKeychain (1.5.3)
 
 DEPENDENCIES:
+  - CryptoSwift
   - ProgressHUD
   - SAMKeychain
 
 SPEC REPOS:
   trunk:
+    - CryptoSwift
     - ProgressHUD
     - SAMKeychain
 
 SPEC CHECKSUMS:
+  CryptoSwift: 52aaf3fce7337552863b1d952e408085f0e65030
   ProgressHUD: 4bdaa0d2ddf676b23324b199f9facffb5c3a1620
   SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
 
-PODFILE CHECKSUM: 70c5d158761a6ab701aaadea728d0d951aa18a5c
+PODFILE CHECKSUM: d8e16a20e42b957479d90ddccd004be8923d0946
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.13.0

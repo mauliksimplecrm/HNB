@@ -196,3 +196,20 @@ func dialTheNumberAndSendResponseBackToWeb(phoneNumber: String, module: String, 
         }
     } else { return}
 }
+
+func convertToDictionary(text: String) -> Any? {
+    if let data = text.data(using: .utf8) {
+        do {
+            return try JSONSerialization.jsonObject(with: data, options: [])
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    return nil
+}
+func jsonBase64(object:Any) -> String? {
+    guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else {
+        return nil
+    }
+    return String(data: data, encoding: String.Encoding.utf8)
+}

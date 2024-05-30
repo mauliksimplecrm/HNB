@@ -40,8 +40,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         IQKeyboardManager.shared.enable = true
         
+        //--
+        UserDefaults.standard.setValue("https://hnbupgradeuatcp.simplecrmdev.com/Api/V8/update_user_details", forKey: "update_user_details")
+        UserDefaults.standard.synchronize()
         
-       
         return true
     }
     
